@@ -1,14 +1,18 @@
 package fr.antoine.questions;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 public class Question {
 
     private final String statement; //The text before the proposition
-    private HashSet<Proposition> propositions; //Propositions
+    private final LinkedList<Proposition> propositions; //Propositions
 
     public Question(final String statement) {
+
         this.statement = statement;
+        this.propositions = new LinkedList<>();
+
     }
 
     /**
@@ -18,6 +22,19 @@ public class Question {
      */
     public void registerProposition(final String text, final boolean correct) { this.propositions.add(new Proposition(text, correct)); }
 
+    public String getStatement() {
+        return statement;
+    }
+
+    public LinkedList<Proposition> getPropositions() {
+        return propositions;
+    }
+
+    @Override
+    public String toString() {
+        return "Text : " + this.statement + " | " + this.propositions;
+    }
+
     public class Proposition {
 
         private String text;
@@ -26,6 +43,14 @@ public class Question {
         public Proposition(final String text, final boolean correct) {
             this.text = text;
             this.correct = correct;
+        }
+
+        @Override
+        public String toString() {
+            return "Proposition{" +
+                    "text='" + text + '\'' +
+                    ", correct=" + correct +
+                    '}';
         }
 
         public String getText() {
@@ -44,5 +69,4 @@ public class Question {
             this.correct = correct;
         }
     }
-
 }
