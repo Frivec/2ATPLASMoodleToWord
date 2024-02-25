@@ -21,28 +21,42 @@ import java.nio.file.Paths;
 
 public class WordCreator {
 
-    private final Path destination;
+    private Path folderDestination;
+    private final String documentName;
 
-    public WordCreator(final Path destination, final String documentName) {
+    public WordCreator(final Path folderDestination, final String documentName) {
 
-        this.destination = Paths.get(destination + "/" + documentName + ".docx");
+        this.folderDestination = folderDestination;
+        this.documentName = documentName;
 
     }
 
-    public void createWordFile() {
+    public void createWordFile(final boolean correction) {
 
-        try (FileOutputStream out = new FileOutputStream(this.destination.toFile())) {
+        final Path destination = Paths.get(this.folderDestination + "/" + documentName + " - " + (correction ? "Correction" : "Sujet") + ".docx");
 
-            final FileInputStream inputStream = new FileInputStream(this.destination.toFile());
+        //Create the file on the destination folder
+        if(Files.notExists(destination)) {
 
-            //Create the file on the destination folder
-            if(Files.notExists(this.destination)) Files.createFile(this.destination);
+            try {
+
+                Files.createFile(destination);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+        try (FileOutputStream out = new FileOutputStream(destination.toFile())) {
+
+            final FileInputStream inputStream = new FileInputStream(destination.toFile());
 
             /*
              * Set the model on the new word document
              */
             final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            final InputStream wordModelStream = classloader.getResourceAsStream("subject.dotx");
+            final InputStream wordModelStream = classloader.getResourceAsStream(correction ? "correction.dotx" : "subject.dotx");
 
             assert wordModelStream != null;
 
@@ -50,7 +64,7 @@ public class WordCreator {
 
             opcPackage.replaceContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml",
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml");
-            opcPackage.save(this.destination.toFile());
+            opcPackage.save(destination.toFile());
 
             /*
              * Starting of the document's writing
@@ -104,8 +118,14 @@ public class WordCreator {
 
                         this.addImage(run, compressedImage);
 
-                    run = paragraph.createRun();
-                    run.setText(proposition.text());
+                    if(correction) {
+
+                        run = paragraph.createRun();
+                        run.setBold(true);
+                        run.setColor(proposition.correct() ? "00b050" : "ff0000");
+                        run.setText(" " + (proposition.correct() ? "VRAI" : "FAUX") + " " + proposition.feedback());
+
+                    }
 
                 }
 

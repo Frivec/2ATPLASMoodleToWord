@@ -27,7 +27,8 @@ public class Main {
         this.fileManager.readFiles();
 
         final WordCreator wordCreator = new WordCreator(Paths.get("C:/Users/antoi/Desktop/"), "Colle n°2");
-        wordCreator.createWordFile();
+        wordCreator.createWordFile(false); //Creation of a subject
+        wordCreator.createWordFile(true); //Creation of a correction
 
     }
 
