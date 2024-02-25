@@ -1,14 +1,12 @@
 package fr.antoine;
 
 import fr.antoine.files.FileManager;
-import fr.antoine.questions.Question;
 import fr.antoine.questions.tests.Test;
 import fr.antoine.questions.tests.TestType;
 import fr.antoine.word.WordCreator;
 
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 
 public class Main {
 

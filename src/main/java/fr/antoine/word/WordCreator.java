@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class WordCreator {
 
-    private Path folderDestination;
+    private final Path folderDestination;
     private final String documentName;
 
     public WordCreator(final Path folderDestination, final String documentName) {
@@ -139,12 +139,16 @@ public class WordCreator {
                      */
                     if (correction) {
 
-                        paragraph = document.createParagraph(); //Paragraph for text correction
-                        paragraph.setStyle("Normal");
+                        if(!question.getGeneralFeedback().isEmpty() || question.getGeneralFbImage().length != 0) {
 
-                        run = paragraph.createRun();
-                        run.setUnderline(UnderlinePatterns.WORDS);
-                        run.setText("Correction");
+                            paragraph = document.createParagraph(); //Paragraph for text correction
+                            paragraph.setStyle("Normal");
+
+                            run = paragraph.createRun();
+                            run.setUnderline(UnderlinePatterns.WORDS);
+                            run.setText("Correction");
+
+                        }
 
                         if (!question.getGeneralFeedback().isEmpty()) {
 

@@ -21,12 +21,7 @@ import java.util.*;
 public class FileManager {
 
     private final Path folder;
-    private final int questionTextIndex = 1, generalFeedbackIndex = 2,
-            aIndex = 6, aFeedbackIndex = 7,
-            bIndex = 8, bFeedbackIndex = 9,
-            cIndex = 10, cFeedbackIndex = 11,
-            dIndex = 12, dFeedbackIndex = 13,
-            eIndex = 14, eFeedbackIndex = 15;
+
     private final LinkedHashMap<String, LinkedList<Path>> questionsFiles;
 
     public FileManager() {
@@ -63,11 +58,7 @@ public class FileManager {
 
                     try {
 
-                        Files.list(folder).forEach(file -> {
-
-                            this.questionsFiles.get(testName).add(file);
-
-                        });
+                        Files.list(folder).forEach(file -> this.questionsFiles.get(testName).add(file));
 
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -85,6 +76,13 @@ public class FileManager {
 
     public void readFiles() {
 
+        final int questionTextIndex = 1, generalFeedbackIndex = 2,
+                aIndex = 6, aFeedbackIndex = 7,
+                bIndex = 8, bFeedbackIndex = 9,
+                cIndex = 10, cFeedbackIndex = 11,
+                dIndex = 12, dFeedbackIndex = 13,
+                eIndex = 14, eFeedbackIndex = 15;
+
         for(Map.Entry<String, LinkedList<Path>> entries : this.questionsFiles.entrySet()) {
 
             final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -96,19 +94,19 @@ public class FileManager {
 
                     final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                     final Document document = documentBuilder.parse(files.toFile());
-                    final Question question = new Question(readTextFromXML(this.questionTextIndex, document), readTextFromXML(this.generalFeedbackIndex, document)
+                    final Question question = new Question(readTextFromXML(questionTextIndex, document), readTextFromXML(generalFeedbackIndex, document)
                             , getImagesFromXML(document, Balise.QUESTION_TEXT), getImagesFromXML(document, Balise.GENERAL_FEEDBACK));
 
-                    question.registerProposition(readTextFromXML(this.aIndex, document), readTextFromXML(this.aFeedbackIndex, document),
-                            getImagesFromXML(document, Balise.ANSWER, 0), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 0), isPropositionCorrect(this.aIndex, document));
-                    question.registerProposition(readTextFromXML(this.bIndex, document), readTextFromXML(this.bFeedbackIndex, document),
-                            getImagesFromXML(document, Balise.ANSWER, 1), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 1), isPropositionCorrect(this.bIndex, document));
-                    question.registerProposition(readTextFromXML(this.cIndex, document), readTextFromXML(this.cFeedbackIndex, document),
-                            getImagesFromXML(document, Balise.ANSWER, 2), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 2), isPropositionCorrect(this.cIndex, document));
-                    question.registerProposition(readTextFromXML(this.dIndex, document), readTextFromXML(this.dFeedbackIndex, document),
-                            getImagesFromXML(document, Balise.ANSWER, 3), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 3), isPropositionCorrect(this.dIndex, document));
-                    question.registerProposition(readTextFromXML(this.eIndex, document), readTextFromXML(this.eFeedbackIndex, document),
-                            getImagesFromXML(document, Balise.ANSWER, 4), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 4), isPropositionCorrect(this.eIndex, document));
+                    question.registerProposition(readTextFromXML(aIndex, document), readTextFromXML(aFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 0), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 0), isPropositionCorrect(aIndex, document));
+                    question.registerProposition(readTextFromXML(bIndex, document), readTextFromXML(bFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 1), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 1), isPropositionCorrect(bIndex, document));
+                    question.registerProposition(readTextFromXML(cIndex, document), readTextFromXML(cFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 2), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 2), isPropositionCorrect(cIndex, document));
+                    question.registerProposition(readTextFromXML(dIndex, document), readTextFromXML(dFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 3), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 3), isPropositionCorrect(dIndex, document));
+                    question.registerProposition(readTextFromXML(eIndex, document), readTextFromXML(eFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 4), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 4), isPropositionCorrect(eIndex, document));
 
                     test.getQuestions().add(question);
 
