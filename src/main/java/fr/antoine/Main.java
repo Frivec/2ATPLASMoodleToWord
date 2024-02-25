@@ -8,8 +8,7 @@ import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTAbstractNum;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLvl;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STNumberFormat;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTNumbering;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class Main {
@@ -28,11 +26,10 @@ public class Main {
     private static Main instance;
 
     private final FileManager fileManager;
-    private XWPFNumbering numbering;
-    protected HashMap<String, XWPFAbstractNum> numberStyles = new HashMap<>();
-    private List<Question> questions = new ArrayList<>();
+    private final List<Question> questions = new ArrayList<>();
 
-    static BigInteger getNewDecimalNumberingId(XWPFDocument document, BigInteger abstractNumID, final ListType listType) {
+    private BigInteger getNewDecimalNumberingId(final XWPFNumbering numbering, BigInteger abstractNumID, final ListType listType) {
+
         CTAbstractNum cTAbstractNum = CTAbstractNum.Factory.newInstance();
         cTAbstractNum.setAbstractNumId(abstractNumID);
 
@@ -43,8 +40,6 @@ public class Main {
         cTLvl.addNewStart().setVal(BigInteger.valueOf(1));
 
         XWPFAbstractNum abstractNum = new XWPFAbstractNum(cTAbstractNum);
-
-        XWPFNumbering numbering = document.createNumbering();
 
         abstractNumID = numbering.addAbstractNum(abstractNum);
 
@@ -80,33 +75,37 @@ public class Main {
             opcPackage.save(wordDocument.toFile());
 
             final XWPFDocument document = new XWPFDocument(inputStream);
+            final XWPFNumbering numbering = document.createNumbering();
+            XWPFParagraph paragraph;
 
-            this.numbering = document.getNumbering();
+            int listID = 1;
 
             for(Question question : this.getQuestions()) {
 
-                final XWPFParagraph paragraph = document.createParagraph();
+                final BigInteger numID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(0), ListType.QCM);
 
-                final BigInteger numID = getNewDecimalNumberingId(document, BigInteger.valueOf(0), ListType.QCM);
-
+                paragraph = document.createParagraph();
                 paragraph.setNumID(numID);
                 paragraph.setStyle("QuestionQCM");
 
-                final XWPFRun run = paragraph.createRun();
+                XWPFRun run = paragraph.createRun();
                 run.setText(question.getStatement());
+
+                final BigInteger propositionNumID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(listID), ListType.ITEM);
 
                 for(Question.Proposition proposition : question.getPropositions()) {
 
-                    final XWPFParagraph propositionParagraph = document.createParagraph();
-                    final BigInteger propositionNumID = getNewDecimalNumberingId(document, BigInteger.valueOf(0), ListType.ITEM);
+                    paragraph = document.createParagraph();
 
-                    propositionParagraph.setNumID(propositionNumID);
-                    propositionParagraph.setStyle("ItemQCM");
+                    paragraph.setNumID(propositionNumID);
+                    paragraph.setStyle("ItemQCM");
 
-                    final XWPFRun runProposition = propositionParagraph.createRun();
-                    runProposition.setText(proposition.getText());
+                    run = paragraph.createRun();
+                    run.setText(proposition.getText());
 
                 }
+
+                listID++;
 
             }
 
