@@ -2,7 +2,9 @@ package fr.antoine.files;
 
 import fr.antoine.Main;
 import fr.antoine.questions.Question;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -12,9 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 public class FileManager {
 

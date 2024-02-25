@@ -127,10 +127,6 @@ public class WordCreator {
 
     /**
      * Add an image in the word document using a compressed image in base 64
-     * @param run
-     * @param compressedImage
-     * @throws IOException
-     * @throws InvalidFormatException
      */
     private void addImage(XWPFRun run, String compressedImage) throws IOException, InvalidFormatException {
         byte[] imageBytes = Base64.decodeBase64(compressedImage);
@@ -146,9 +142,6 @@ public class WordCreator {
 
     /**
      * Return the Dimension of an image from bytes
-     * @param imageBytes
-     * @return
-     * @throws IOException
      */
     private Dimension getDimension(final byte[] imageBytes) throws IOException {
 
@@ -167,10 +160,6 @@ public class WordCreator {
 
     /**
      * Create new list format and restart indexation
-     * @param numbering
-     * @param abstractNumID
-     * @param listType
-     * @return
      */
     private BigInteger getNewDecimalNumberingId(final XWPFNumbering numbering, BigInteger abstractNumID, final ListType listType) {
 

@@ -2,28 +2,10 @@ package fr.antoine;
 
 import fr.antoine.files.FileManager;
 import fr.antoine.questions.Question;
-import fr.antoine.word.ListType;
 import fr.antoine.word.WordCreator;
-import jakarta.xml.bind.DatatypeConverter;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.util.Units;
-import org.apache.poi.xwpf.usermodel.*;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTAbstractNum;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLvl;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Main {
 
@@ -32,7 +14,7 @@ public class Main {
     private final FileManager fileManager;
     private final LinkedList<Question> questions;
 
-    public static void main(String[] args) throws Exception { new Main(); }
+    public static void main(String[] args) { new Main(); }
 
     public Main() {
 
