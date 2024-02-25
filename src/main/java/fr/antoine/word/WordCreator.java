@@ -129,6 +129,42 @@ public class WordCreator {
 
                 }
 
+                /*
+                 * Add general feedback
+                 */
+                if(correction) {
+
+                    paragraph = document.createParagraph(); //Paragraph for text correction
+                    paragraph.setStyle("Normal");
+
+                    run = paragraph.createRun();
+                    run.setUnderline(UnderlinePatterns.WORDS);
+                    run.setText("Correction");
+
+                    if(!question.getGeneralFeedback().isEmpty()) {
+
+                        paragraph = document.createParagraph(); //Paragraph for text correction
+                        paragraph.setStyle("Normal");
+
+                        run = paragraph.createRun();
+                        run.setText(question.getGeneralFeedback());
+
+                    }
+
+                    //Paragraph for images
+                    paragraph = document.createParagraph();
+                    paragraph.setStyle("Normal");
+                    paragraph.setAlignment(ParagraphAlignment.CENTER);
+
+                    run = paragraph.createRun();
+                    run.setText(question.getGeneralFeedback());
+
+                    for (String compressedImage : question.getGeneralFbImage())
+
+                        this.addImage(run, compressedImage);
+
+                }
+
                 listID++;
 
             }
