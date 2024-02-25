@@ -1,20 +1,20 @@
 package fr.antoine.questions;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 
 public class Question {
 
     private final String statement, //The text before the proposition
                             generalFeedback;
+    private final String[] statementImage, generalFbImage; //images in base64 code
     private final LinkedList<Proposition> propositions; //Propositions
 
-    public Question(final String statement, final String generalFeedback) {
-
+    public Question(String statement, String generalFeedback, String[] statementImage, String[] generalFbImage) {
         this.statement = statement;
         this.generalFeedback = generalFeedback;
+        this.statementImage = statementImage;
+        this.generalFbImage = generalFbImage;
         this.propositions = new LinkedList<>();
-
     }
 
     /**
@@ -22,9 +22,9 @@ public class Question {
      * @param text - {@link String} : The text of the proposition
      * @param correct - {@link Boolean} : Is this proposition correct ?
      */
-    public void registerProposition(final String text, final String feedback, final boolean correct) {
+    public void registerProposition(final String text, final String feedback, final String[] propositionImage, final String[] feedbackImage, final boolean correct) {
 
-        this.propositions.add(new Proposition(text, feedback, correct));
+        this.propositions.add(new Proposition(text, feedback, propositionImage, feedbackImage, correct));
 
     }
 
@@ -40,41 +40,28 @@ public class Question {
         return generalFeedback;
     }
 
+    public String[] getStatementImage() {
+        return statementImage;
+    }
+
+    public String[] getGeneralFbImage() {
+        return generalFbImage;
+    }
+
     @Override
     public String toString() {
         return "Text : " + this.statement + " | " + this.propositions;
     }
 
-    public class Proposition {
-
-        private final String text,
-                        feedback;
-        private final boolean correct;
-
-        public Proposition(final String text, final String feedback, final boolean correct) {
-            this.text = text;
-            this.feedback = feedback;
-            this.correct = correct;
-        }
+    public record Proposition(String text, String feedback, String[] propositionImage, String[] feedbackImage,
+                              boolean correct) {
 
         @Override
         public String toString() {
             return "Proposition{" +
-                    "text='" + text + '\'' +
-                    ", correct=" + correct +
-                    '}';
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public String getFeedback() {
-            return feedback;
-        }
-
-        public boolean isCorrect() {
-            return correct;
+                        "text='" + text + '\'' +
+                        ", correct=" + correct +
+                        '}';
         }
     }
 }

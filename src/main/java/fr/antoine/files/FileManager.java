@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 public class FileManager {
 
@@ -58,13 +60,19 @@ public class FileManager {
 
                 final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 final Document document = documentBuilder.parse(file.toFile());
-                final Question question = new Question(readTextFromXML(this.questionTextIndex, document), readTextFromXML(this.generalFeedbackIndex, document));
+                final Question question = new Question(readTextFromXML(this.questionTextIndex, document), readTextFromXML(this.generalFeedbackIndex, document)
+                , getImagesFromXML(document, Balise.QUESTION_TEXT), getImagesFromXML(document, Balise.GENERAL_FEEDBACK));
 
-                question.registerProposition(readTextFromXML(this.aIndex, document), readTextFromXML(this.aIndex, document), isPropositionCorrect(this.aIndex, document));
-                question.registerProposition(readTextFromXML(this.bIndex, document), readTextFromXML(this.bIndex, document), isPropositionCorrect(this.bIndex, document));
-                question.registerProposition(readTextFromXML(this.cIndex, document), readTextFromXML(this.cIndex, document), isPropositionCorrect(this.cIndex, document));
-                question.registerProposition(readTextFromXML(this.dIndex, document), readTextFromXML(this.dIndex, document), isPropositionCorrect(this.dIndex, document));
-                question.registerProposition(readTextFromXML(this.eIndex, document), readTextFromXML(this.eIndex, document), isPropositionCorrect(this.eIndex, document));
+                question.registerProposition(readTextFromXML(this.aIndex, document), readTextFromXML(this.aIndex, document),
+                        getImagesFromXML(document, Balise.ANSWER, 0), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 0), isPropositionCorrect(this.aIndex, document));
+                question.registerProposition(readTextFromXML(this.bIndex, document), readTextFromXML(this.bIndex, document),
+                        getImagesFromXML(document, Balise.ANSWER, 1), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 1), isPropositionCorrect(this.aIndex, document));
+                question.registerProposition(readTextFromXML(this.cIndex, document), readTextFromXML(this.cIndex, document),
+                        getImagesFromXML(document, Balise.ANSWER, 2), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 2), isPropositionCorrect(this.aIndex, document));
+                question.registerProposition(readTextFromXML(this.dIndex, document), readTextFromXML(this.dIndex, document),
+                        getImagesFromXML(document, Balise.ANSWER, 3), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 3), isPropositionCorrect(this.aIndex, document));
+                question.registerProposition(readTextFromXML(this.eIndex, document), readTextFromXML(this.eIndex, document),
+                        getImagesFromXML(document, Balise.ANSWER, 4), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 4), isPropositionCorrect(this.aIndex, document));
 
                 Main.getInstance().getQuestions().add(question);
 
@@ -73,6 +81,45 @@ public class FileManager {
             }
 
         });
+
+    }
+
+    private String[] getImagesFromXML(final Document document, final Balise balise) {
+
+        return getImagesFromXML(document, balise, 0);
+
+    }
+
+    private String[] getImagesFromXML(final Document document, final Balise balise, final int index) {
+
+        NodeList list = document.getElementsByTagName(balise.getName()),
+                        childList = null;
+
+        if(list.item(index) != null)
+
+            childList = list.item(index).getChildNodes();
+
+        if(childList == null)
+
+            return new String[] {};
+
+        final StringBuilder images = new StringBuilder();
+
+        for(int i = 0; i < childList.getLength(); i++) {
+
+            if (childList.item(i).getTextContent().matches("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"))
+
+                images.append(childList.item(i).getTextContent());
+
+        }
+
+        final String[] base64Images = images.toString().split("=");
+
+        for(int i = 0; i < base64Images.length; i++)
+
+            base64Images[i] = base64Images[i] + "=";
+
+        return base64Images;
 
     }
 
@@ -94,6 +141,24 @@ public class FileManager {
 
         return !element.getAttribute("fraction").contains("-");
 
+    }
+
+    private enum Balise {
+
+        QUESTION_TEXT("questiontext"),
+        GENERAL_FEEDBACK("generalfeedback"),
+        ANSWER("answer"),
+        ANSWER_FEEDBACK("answer");
+
+        private final String name;
+
+        Balise(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
 }

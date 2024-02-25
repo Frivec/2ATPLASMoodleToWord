@@ -3,17 +3,19 @@ package fr.antoine;
 import fr.antoine.files.FileManager;
 import fr.antoine.questions.Question;
 import fr.antoine.word.ListType;
+import jakarta.xml.bind.DatatypeConverter;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTAbstractNum;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLvl;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTNumbering;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,9 +58,9 @@ public class Main {
         this.fileManager.registerFiles();
         this.fileManager.readFiles();
 
-        try (FileOutputStream out = new FileOutputStream("C:/Users/antoi/Desktop/TestWord.docx")) {
+        try (FileOutputStream out = new FileOutputStream("C:/Users/antoi/Desktop/Colle.docx")) {
 
-            final Path wordDocument = Paths.get("C:/Users/antoi/Desktop/TestWord.docx");
+            final Path wordDocument = Paths.get("C:/Users/antoi/Desktop/Colle.docx");
             final FileInputStream inputStream = new FileInputStream(wordDocument.toFile());
 
             if(Files.notExists(wordDocument)) Files.createFile(wordDocument);
@@ -91,6 +93,24 @@ public class Main {
                 XWPFRun run = paragraph.createRun();
                 run.setText(question.getStatement());
 
+                for (String compressedImage : question.getStatementImage()) {
+
+                    paragraph = document.createParagraph();
+                    paragraph.setAlignment(ParagraphAlignment.CENTER);
+                    run = paragraph.createRun();
+
+                    byte[] imageBytes = Base64.decodeBase64(compressedImage);
+                    final Dimension dimension = getDimension(imageBytes);
+                    final ByteArrayInputStream imageStream = new ByteArrayInputStream(imageBytes);
+
+                    if (dimension != null)
+
+                        run.addPicture(imageStream, XWPFDocument.PICTURE_TYPE_PNG, "image.png", Units.toEMU(dimension.getWidth()), Units.toEMU(dimension.getHeight()));
+
+                    imageStream.close();
+
+                }
+
                 final BigInteger propositionNumID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(listID), ListType.ITEM);
 
                 for(Question.Proposition proposition : question.getPropositions()) {
@@ -101,7 +121,27 @@ public class Main {
                     paragraph.setStyle("ItemQCM");
 
                     run = paragraph.createRun();
-                    run.setText(proposition.getText());
+
+                    if(!proposition.text().isEmpty())
+
+                        run.setText(proposition.text());
+
+                    for (String compressedImage : proposition.propositionImage()) {
+
+                        byte[] imageBytes = Base64.decodeBase64(compressedImage);
+                        final Dimension dimension = getDimension(imageBytes);
+                        final ByteArrayInputStream imageStream = new ByteArrayInputStream(imageBytes);
+
+                        if (dimension != null)
+
+                            run.addPicture(imageStream, XWPFDocument.PICTURE_TYPE_PNG, "image.png", Units.toEMU(dimension.getWidth()), Units.toEMU(dimension.getHeight()));
+
+                        imageStream.close();
+
+                    }
+
+                    run = paragraph.createRun();
+                    run.setText(proposition.text());
 
                 }
 
@@ -113,9 +153,32 @@ public class Main {
             inputStream.close();
             wordModelStream.close();
 
+            System.out.println("Colle générée avec succès !");
+
         } catch (IOException | InvalidFormatException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    /**
+     * Return the Dimension of an image from bytes
+     * @param imageBytes
+     * @return
+     * @throws IOException
+     */
+    private Dimension getDimension(final byte[] imageBytes) throws IOException {
+
+        final ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
+        final BufferedImage image = ImageIO.read(inputStream);
+
+        if(image == null)
+
+            return null;
+
+        inputStream.close();
+
+        return new Dimension(image.getWidth(), image.getHeight());
 
     }
 
