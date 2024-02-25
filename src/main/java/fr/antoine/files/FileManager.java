@@ -2,6 +2,8 @@ package fr.antoine.files;
 
 import fr.antoine.Main;
 import fr.antoine.questions.Question;
+import fr.antoine.questions.tests.Test;
+import fr.antoine.questions.tests.TestType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -14,7 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 public class FileManager {
 
@@ -25,12 +27,12 @@ public class FileManager {
             cIndex = 10, cFeedbackIndex = 11,
             dIndex = 12, dFeedbackIndex = 13,
             eIndex = 14, eFeedbackIndex = 15;
-    private final LinkedHashSet<Path> questionsFiles;
+    private final LinkedHashMap<String, LinkedList<Path>> questionsFiles;
 
     public FileManager() {
 
-        this.folder = Paths.get("/questions/");
-        this.questionsFiles = new LinkedHashSet<>();
+        this.folder = Paths.get("questions");
+        this.questionsFiles = new LinkedHashMap<>();
 
     }
 
@@ -39,10 +41,41 @@ public class FileManager {
         try {
 
             //Create repository if not exists
-            if(Files.notExists(this.folder)) Files.createDirectory(this.folder);
+            if(Files.notExists(this.folder)) {
+
+                Files.createDirectory(this.folder);
+
+                for(TestType types : TestType.values())
+
+                    Files.createDirectory(Paths.get(this.folder + "/" + types.getFrenchName()));
+
+            }
 
             //Get all files in the folder
-            Files.list(this.folder).forEach(this.questionsFiles::add);
+            Files.list(this.folder).forEach(folder -> {
+
+                if(Files.isDirectory(folder)) {
+
+                    final String testName = folder.toFile().getName();
+
+                    Main.getInstance().getTests().put(TestType.getTypeByName(testName), new Test(testName, TestType.getTypeByName(testName)));
+                    this.questionsFiles.put(testName, new LinkedList<>());
+
+                    try {
+
+                        Files.list(folder).forEach(file -> {
+
+                            this.questionsFiles.get(testName).add(file);
+
+                        });
+
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }
+
+            });
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -52,35 +85,40 @@ public class FileManager {
 
     public void readFiles() {
 
-        this.questionsFiles.forEach(file -> {
+        for(Map.Entry<String, LinkedList<Path>> entries : this.questionsFiles.entrySet()) {
 
             final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            final Test test = Main.getInstance().getTests().get(TestType.getTypeByName(entries.getKey()));
 
-            try {
+            for(Path files : entries.getValue()) {
 
-                final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-                final Document document = documentBuilder.parse(file.toFile());
-                final Question question = new Question(readTextFromXML(this.questionTextIndex, document), readTextFromXML(this.generalFeedbackIndex, document)
-                , getImagesFromXML(document, Balise.QUESTION_TEXT), getImagesFromXML(document, Balise.GENERAL_FEEDBACK));
+                try {
 
-                question.registerProposition(readTextFromXML(this.aIndex, document), readTextFromXML(this.aFeedbackIndex, document),
-                        getImagesFromXML(document, Balise.ANSWER, 0), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 0), isPropositionCorrect(this.aIndex, document));
-                question.registerProposition(readTextFromXML(this.bIndex, document), readTextFromXML(this.bFeedbackIndex, document),
-                        getImagesFromXML(document, Balise.ANSWER, 1), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 1), isPropositionCorrect(this.bIndex, document));
-                question.registerProposition(readTextFromXML(this.cIndex, document), readTextFromXML(this.cFeedbackIndex, document),
-                        getImagesFromXML(document, Balise.ANSWER, 2), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 2), isPropositionCorrect(this.cIndex, document));
-                question.registerProposition(readTextFromXML(this.dIndex, document), readTextFromXML(this.dFeedbackIndex, document),
-                        getImagesFromXML(document, Balise.ANSWER, 3), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 3), isPropositionCorrect(this.dIndex, document));
-                question.registerProposition(readTextFromXML(this.eIndex, document), readTextFromXML(this.eFeedbackIndex, document),
-                        getImagesFromXML(document, Balise.ANSWER, 4), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 4), isPropositionCorrect(this.eIndex, document));
+                    final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                    final Document document = documentBuilder.parse(files.toFile());
+                    final Question question = new Question(readTextFromXML(this.questionTextIndex, document), readTextFromXML(this.generalFeedbackIndex, document)
+                            , getImagesFromXML(document, Balise.QUESTION_TEXT), getImagesFromXML(document, Balise.GENERAL_FEEDBACK));
 
-                Main.getInstance().getQuestions().add(question);
+                    question.registerProposition(readTextFromXML(this.aIndex, document), readTextFromXML(this.aFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 0), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 0), isPropositionCorrect(this.aIndex, document));
+                    question.registerProposition(readTextFromXML(this.bIndex, document), readTextFromXML(this.bFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 1), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 1), isPropositionCorrect(this.bIndex, document));
+                    question.registerProposition(readTextFromXML(this.cIndex, document), readTextFromXML(this.cFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 2), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 2), isPropositionCorrect(this.cIndex, document));
+                    question.registerProposition(readTextFromXML(this.dIndex, document), readTextFromXML(this.dFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 3), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 3), isPropositionCorrect(this.dIndex, document));
+                    question.registerProposition(readTextFromXML(this.eIndex, document), readTextFromXML(this.eFeedbackIndex, document),
+                            getImagesFromXML(document, Balise.ANSWER, 4), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 4), isPropositionCorrect(this.eIndex, document));
 
-            } catch (SAXException | IOException | ParserConfigurationException e) {
-                throw new RuntimeException(e);
+                    test.getQuestions().add(question);
+
+                } catch (SAXException | IOException | ParserConfigurationException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
-        });
+        }
 
     }
 

@@ -2,6 +2,8 @@ package fr.antoine.word;
 
 import fr.antoine.Main;
 import fr.antoine.questions.Question;
+import fr.antoine.questions.tests.Test;
+import fr.antoine.questions.tests.TestType;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -18,6 +20,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class WordCreator {
 
@@ -75,97 +78,101 @@ public class WordCreator {
 
             int listID = 1; //Allows to restart a new list for each question
 
-            for(Question question : Main.getInstance().getQuestions()) {
+            for(Map.Entry<TestType, Test> tests : Main.getInstance().getTests().entrySet()) {
 
-                final BigInteger numID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(0), ListType.QCM); //Get the list format
+                for (Question question : tests.getValue().getQuestions()) {
 
-                paragraph = document.createParagraph();
-                paragraph.setNumID(numID); //Set the list format
-                paragraph.setStyle("QuestionQCM"); //Set the style of the text inside the paragraph
-
-                XWPFRun run = paragraph.createRun(); //The run is mandatory to write text ou to addan image (ie)
-                run.setText(question.getStatement());
-
-                /*
-                 * Add all images for the statement
-                 */
-                for (String compressedImage : question.getStatementImage()) {
+                    final BigInteger numID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(0), ListType.QCM); //Get the list format
 
                     paragraph = document.createParagraph();
-                    paragraph.setAlignment(ParagraphAlignment.CENTER);
-                    run = paragraph.createRun();
+                    paragraph.setNumID(numID); //Set the list format
+                    paragraph.setStyle("QuestionQCM"); //Set the style of the text inside the paragraph
 
-                    addImage(run, compressedImage);
+                    XWPFRun run = paragraph.createRun(); //The run is mandatory to write text ou to addan image (ie)
+                    run.setText(question.getStatement());
 
-                }
+                    /*
+                     * Add all images for the statement
+                     */
+                    for (String compressedImage : question.getStatementImage()) {
 
-                final BigInteger propositionNumID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(listID), ListType.ITEM); //Get the style for MCQ's items
-
-                for(Question.Proposition proposition : question.getPropositions()) { //Add all the propositions for the MCQ
-
-                    paragraph = document.createParagraph();
-
-                    paragraph.setNumID(propositionNumID);
-                    paragraph.setStyle("ItemQCM");
-
-                    run = paragraph.createRun();
-
-                    if(!proposition.text().isEmpty())
-
-                        run.setText(proposition.text());
-
-                    for (String compressedImage : proposition.propositionImage())
-
-                        this.addImage(run, compressedImage);
-
-                    if(correction) {
-
+                        paragraph = document.createParagraph();
+                        paragraph.setAlignment(ParagraphAlignment.CENTER);
                         run = paragraph.createRun();
-                        run.setBold(true);
-                        run.setColor(proposition.correct() ? "00b050" : "ff0000");
-                        run.setText(" " + (proposition.correct() ? "VRAI" : "FAUX") + " " + proposition.feedback());
+
+                        addImage(run, compressedImage);
 
                     }
 
-                }
+                    final BigInteger propositionNumID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(listID), ListType.ITEM); //Get the style for MCQ's items
 
-                /*
-                 * Add general feedback
-                 */
-                if(correction) {
+                    for (Question.Proposition proposition : question.getPropositions()) { //Add all the propositions for the MCQ
 
-                    paragraph = document.createParagraph(); //Paragraph for text correction
-                    paragraph.setStyle("Normal");
+                        paragraph = document.createParagraph();
 
-                    run = paragraph.createRun();
-                    run.setUnderline(UnderlinePatterns.WORDS);
-                    run.setText("Correction");
+                        paragraph.setNumID(propositionNumID);
+                        paragraph.setStyle("ItemQCM");
 
-                    if(!question.getGeneralFeedback().isEmpty()) {
+                        run = paragraph.createRun();
+
+                        if (!proposition.text().isEmpty())
+
+                            run.setText(proposition.text());
+
+                        for (String compressedImage : proposition.propositionImage())
+
+                            this.addImage(run, compressedImage);
+
+                        if (correction) {
+
+                            run = paragraph.createRun();
+                            run.setBold(true);
+                            run.setColor(proposition.correct() ? "00b050" : "ff0000");
+                            run.setText(" " + (proposition.correct() ? "VRAI" : "FAUX") + " " + proposition.feedback());
+
+                        }
+
+                    }
+
+                    /*
+                     * Add general feedback
+                     */
+                    if (correction) {
 
                         paragraph = document.createParagraph(); //Paragraph for text correction
                         paragraph.setStyle("Normal");
 
                         run = paragraph.createRun();
+                        run.setUnderline(UnderlinePatterns.WORDS);
+                        run.setText("Correction");
+
+                        if (!question.getGeneralFeedback().isEmpty()) {
+
+                            paragraph = document.createParagraph(); //Paragraph for text correction
+                            paragraph.setStyle("Normal");
+
+                            run = paragraph.createRun();
+                            run.setText(question.getGeneralFeedback());
+
+                        }
+
+                        //Paragraph for images
+                        paragraph = document.createParagraph();
+                        paragraph.setStyle("Normal");
+                        paragraph.setAlignment(ParagraphAlignment.CENTER);
+
+                        run = paragraph.createRun();
                         run.setText(question.getGeneralFeedback());
+
+                        for (String compressedImage : question.getGeneralFbImage())
+
+                            this.addImage(run, compressedImage);
 
                     }
 
-                    //Paragraph for images
-                    paragraph = document.createParagraph();
-                    paragraph.setStyle("Normal");
-                    paragraph.setAlignment(ParagraphAlignment.CENTER);
-
-                    run = paragraph.createRun();
-                    run.setText(question.getGeneralFeedback());
-
-                    for (String compressedImage : question.getGeneralFbImage())
-
-                        this.addImage(run, compressedImage);
+                    listID++;
 
                 }
-
-                listID++;
 
             }
 

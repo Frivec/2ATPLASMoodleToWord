@@ -2,9 +2,12 @@ package fr.antoine;
 
 import fr.antoine.files.FileManager;
 import fr.antoine.questions.Question;
+import fr.antoine.questions.tests.Test;
+import fr.antoine.questions.tests.TestType;
 import fr.antoine.word.WordCreator;
 
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 public class Main {
@@ -12,7 +15,7 @@ public class Main {
     private static Main instance;
 
     private final FileManager fileManager;
-    private final LinkedList<Question> questions;
+    private final LinkedHashMap<TestType, Test> tests;
 
     public static void main(String[] args) { new Main(); }
 
@@ -20,11 +23,13 @@ public class Main {
 
         instance = this;
 
-        this.questions = new LinkedList<>();
+        this.tests = new LinkedHashMap<>();
 
         this.fileManager = new FileManager();
         this.fileManager.registerFiles();
         this.fileManager.readFiles();
+
+        System.out.println("Tests : " + this.tests.get(TestType.ANATOMY).getQuestions().size());
 
         final WordCreator wordCreator = new WordCreator(Paths.get("C:/Users/antoi/Desktop/"), "Colle n°2");
         wordCreator.createWordFile(false); //Creation of a subject
@@ -40,7 +45,7 @@ public class Main {
         return fileManager;
     }
 
-    public LinkedList<Question> getQuestions() {
-        return questions;
+    public LinkedHashMap<TestType, Test> getTests() {
+        return tests;
     }
 }

@@ -7,15 +7,14 @@ import java.util.List;
 
 public class Test {
 
-    private String name, statement;
+    private String name;
     private TestType type;
     private List<Question> questions;
 
-    public Test(final String name, final TestType type, final String statement) {
+    public Test(final String name, final TestType type) {
 
         this.name = name;
         this.type = type;
-        this.statement = statement;
         this.questions = new ArrayList<>();
 
     }
@@ -34,14 +33,6 @@ public class Test {
 
     public void setType(TestType type) {
         this.type = type;
-    }
-
-    public String getStatement() {
-        return statement;
-    }
-
-    public void setStatement(String statement) {
-        this.statement = statement;
     }
 
     public List<Question> getQuestions() {
