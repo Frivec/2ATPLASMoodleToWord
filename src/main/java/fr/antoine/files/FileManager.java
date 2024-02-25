@@ -1,5 +1,6 @@
 package fr.antoine.files;
 
+import fr.antoine.Main;
 import fr.antoine.questions.Question;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -57,15 +58,15 @@ public class FileManager {
 
                 final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 final Document document = documentBuilder.parse(file.toFile());
-                final Question question = new Question(readTextFromXML(this.questionTextIndex, document));
+                final Question question = new Question(readTextFromXML(this.questionTextIndex, document), readTextFromXML(this.generalFeedbackIndex, document));
 
-                question.registerProposition(readTextFromXML(this.aIndex, document), isPropositionCorrect(this.aIndex, document));
-                question.registerProposition(readTextFromXML(this.bIndex, document), isPropositionCorrect(this.bIndex, document));
-                question.registerProposition(readTextFromXML(this.cIndex, document), isPropositionCorrect(this.cIndex, document));
-                question.registerProposition(readTextFromXML(this.dIndex, document), isPropositionCorrect(this.dIndex, document));
-                question.registerProposition(readTextFromXML(this.eIndex, document), isPropositionCorrect(this.eIndex, document));
+                question.registerProposition(readTextFromXML(this.aIndex, document), readTextFromXML(this.aIndex, document), isPropositionCorrect(this.aIndex, document));
+                question.registerProposition(readTextFromXML(this.bIndex, document), readTextFromXML(this.bIndex, document), isPropositionCorrect(this.bIndex, document));
+                question.registerProposition(readTextFromXML(this.cIndex, document), readTextFromXML(this.cIndex, document), isPropositionCorrect(this.cIndex, document));
+                question.registerProposition(readTextFromXML(this.dIndex, document), readTextFromXML(this.dIndex, document), isPropositionCorrect(this.dIndex, document));
+                question.registerProposition(readTextFromXML(this.eIndex, document), readTextFromXML(this.eIndex, document), isPropositionCorrect(this.eIndex, document));
 
-                System.out.println(question.getPropositions().get(4));
+                Main.getInstance().getQuestions().add(question);
 
             } catch (SAXException | IOException | ParserConfigurationException e) {
                 throw new RuntimeException(e);
@@ -79,6 +80,8 @@ public class FileManager {
 
         String text = document.getElementsByTagName("text").item(index).getTextContent();
         text = text.replaceAll("<.*?>", "");
+        text = text.replaceAll("QCM\\s\\d+\\.", "");
+        text = text.replaceAll("QCM\\s\\d+\\s-\\s", "");
 
         return text;
 

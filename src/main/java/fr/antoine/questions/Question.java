@@ -5,12 +5,14 @@ import java.util.LinkedList;
 
 public class Question {
 
-    private final String statement; //The text before the proposition
+    private final String statement, //The text before the proposition
+                            generalFeedback;
     private final LinkedList<Proposition> propositions; //Propositions
 
-    public Question(final String statement) {
+    public Question(final String statement, final String generalFeedback) {
 
         this.statement = statement;
+        this.generalFeedback = generalFeedback;
         this.propositions = new LinkedList<>();
 
     }
@@ -20,7 +22,11 @@ public class Question {
      * @param text - {@link String} : The text of the proposition
      * @param correct - {@link Boolean} : Is this proposition correct ?
      */
-    public void registerProposition(final String text, final boolean correct) { this.propositions.add(new Proposition(text, correct)); }
+    public void registerProposition(final String text, final String feedback, final boolean correct) {
+
+        this.propositions.add(new Proposition(text, feedback, correct));
+
+    }
 
     public String getStatement() {
         return statement;
@@ -30,6 +36,10 @@ public class Question {
         return propositions;
     }
 
+    public String getGeneralFeedback() {
+        return generalFeedback;
+    }
+
     @Override
     public String toString() {
         return "Text : " + this.statement + " | " + this.propositions;
@@ -37,11 +47,13 @@ public class Question {
 
     public class Proposition {
 
-        private String text;
-        private boolean correct;
+        private final String text,
+                        feedback;
+        private final boolean correct;
 
-        public Proposition(final String text, final boolean correct) {
+        public Proposition(final String text, final String feedback, final boolean correct) {
             this.text = text;
+            this.feedback = feedback;
             this.correct = correct;
         }
 
@@ -57,16 +69,12 @@ public class Question {
             return text;
         }
 
-        public void setText(String text) {
-            this.text = text;
+        public String getFeedback() {
+            return feedback;
         }
 
         public boolean isCorrect() {
             return correct;
-        }
-
-        public void setCorrect(boolean correct) {
-            this.correct = correct;
         }
     }
 }
