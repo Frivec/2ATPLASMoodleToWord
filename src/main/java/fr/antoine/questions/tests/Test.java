@@ -2,20 +2,21 @@ package fr.antoine.questions.tests;
 
 import fr.antoine.questions.Question;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Test {
 
     private String name, statement;
     private TestType type;
-    private HashMap<Integer, Question> questions;
+    private List<Question> questions;
 
     public Test(final String name, final TestType type, final String statement) {
 
         this.name = name;
         this.type = type;
         this.statement = statement;
-        this.questions = new HashMap<>();
+        this.questions = new ArrayList<>();
 
     }
 
@@ -43,11 +44,11 @@ public class Test {
         this.statement = statement;
     }
 
-    public HashMap<Integer, Question> getQuestions() {
+    public List<Question> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(HashMap<Integer, Question> questions) {
+    public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
 }
