@@ -1,7 +1,7 @@
 package fr.antoine;
 
 import fr.antoine.files.FileManager;
-import fr.antoine.gui.MainWindow;
+import fr.antoine.gui.MainFrame;
 import fr.antoine.questions.tests.Test;
 import fr.antoine.questions.tests.TestType;
 import fr.antoine.word.WordCreator;
@@ -28,11 +28,7 @@ public class Main {
         this.fileManager.registerFiles();
         this.fileManager.readFiles();
 
-        new MainWindow(); //Start frame
-
-//        final WordCreator wordCreator = new WordCreator(Paths.get("C:/Users/antoi/Desktop/"), "Colle n°2");
-//        wordCreator.createWordFile(false); //Creation of a subject
-//        wordCreator.createWordFile(true); //Creation of a correction
+        new MainFrame(); //Start frame
 
     }
 

@@ -39,6 +39,11 @@
             <artifactId>jakarta.xml.bind-api</artifactId>
             <version>3.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>javac2</artifactId>
+            <version>7.0.3</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -46,6 +51,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.2</version>
                 <executions>
                     <execution>
                         <id>LasMoodle</id>
@@ -72,5 +78,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
