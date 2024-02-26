@@ -75,20 +75,44 @@ public class WordCreator {
             final XWPFDocument document = new XWPFDocument(inputStream);
             final XWPFNumbering numbering = document.createNumbering();
             XWPFParagraph paragraph;
+            XWPFRun run;
 
-            int listID = 1; //Allows to restart a new list for each question
+            int propositionListID = 1, //Allows to restart a new list for each question
+                    testListID = 0;
 
             for(Map.Entry<TestType, Test> tests : Main.getInstance().getTests().entrySet()) {
 
+                if(!tests.getValue().getQuestions().isEmpty()) {
+
+                    paragraph = document.createParagraph();
+                    paragraph.setAlignment(ParagraphAlignment.CENTER);
+
+                    run = paragraph.createRun();
+                    run.setFontSize(36);
+                    run.setBold(true);
+                    run.setFontFamily("RockWell");
+                    run.setText("[Module " + tests.getKey().getFrenchName() + "]");
+
+                    paragraph = document.createParagraph();
+                    paragraph.setAlignment(ParagraphAlignment.CENTER);
+
+                    run = paragraph.createRun();
+                    run.setItalic(true);
+                    run.setFontSize(18);
+                    run.setFontFamily("RockWell");
+                    run.setText("moduleX@asso2atp.fr");
+
+                }
+
                 for (Question question : tests.getValue().getQuestions()) {
 
-                    final BigInteger numID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(0), ListType.QCM); //Get the list format
+                    final BigInteger numID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(testListID), ListType.QCM); //Get the list format
 
                     paragraph = document.createParagraph();
                     paragraph.setNumID(numID); //Set the list format
                     paragraph.setStyle("QuestionQCM"); //Set the style of the text inside the paragraph
 
-                    XWPFRun run = paragraph.createRun(); //The run is mandatory to write text ou to addan image (ie)
+                    run = paragraph.createRun(); //The run is mandatory to write text ou to addan image (ie)
                     run.setText(question.getStatement());
 
                     /*
@@ -104,7 +128,7 @@ public class WordCreator {
 
                     }
 
-                    final BigInteger propositionNumID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(listID), ListType.ITEM); //Get the style for MCQ's items
+                    final BigInteger propositionNumID = getNewDecimalNumberingId(numbering, BigInteger.valueOf(propositionListID), ListType.ITEM); //Get the style for MCQ's items
 
                     for (Question.Proposition proposition : question.getPropositions()) { //Add all the propositions for the MCQ
 
@@ -174,9 +198,11 @@ public class WordCreator {
 
                     }
 
-                    listID++;
+                    propositionListID+=2;
 
                 }
+
+                testListID+=2;
 
             }
 
