@@ -36,7 +36,7 @@ public class ProgressBar {
         this.titleLabel.setText(title);
         this.jDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.jDialog.setContentPane(this.panel);
-        this.jDialog.setSize(new Dimension((int) (Main.getInstance().getMainFrame().getWidth() / 2.8), Main.getInstance().getMainFrame().getHeight() / 6));
+        this.jDialog.setSize(new Dimension(Main.getInstance().getMainFrame().getWidth() / 2, Main.getInstance().getMainFrame().getHeight() / 6));
         this.jDialog.setUndecorated(true);
         this.jDialog.setLocationRelativeTo(Main.getInstance().getMainFrame());
         this.jDialog.setVisible(true);

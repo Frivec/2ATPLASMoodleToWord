@@ -13,6 +13,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTAbstractNum;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLvl;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -46,7 +47,10 @@ public class WordCreator {
                 Files.createFile(destination);
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+
+                JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), "Une erreur est survenue lors de la création du fichier Word." +
+                        "\nEssaye de sélectionner un autre dossier.");
+                return;
             }
 
         }
@@ -214,7 +218,12 @@ public class WordCreator {
             System.out.println("Colle générée avec succès !");
 
         } catch (IOException | InvalidFormatException e) {
-            throw new RuntimeException(e);
+
+            JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), """
+                    Une erreur est survenue lors de l'écriture du fichier Word.
+                    Si le fichier Word est déjà ouvert, ferme-le avant de relancer la génération !
+                    Si l'erreur persiste, sélectionne un autre dossier de destination.""", "Dialog", JOptionPane.ERROR_MESSAGE);
+
         }
 
     }

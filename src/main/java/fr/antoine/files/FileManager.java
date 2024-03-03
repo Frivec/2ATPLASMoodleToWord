@@ -14,17 +14,17 @@ import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class FileManager {
 
     private final Path folder;
-    private ProgressBar bar;
 
     private final LinkedHashMap<String, LinkedList<Path>> questionsFiles;
 
@@ -83,7 +83,7 @@ public class FileManager {
 
             if(areAllEmpty) {
 
-                JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), "Aucune question n'a été trouvée.\nAjoute tes fichiers Moodle et relance l'application !");
+                JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), "Aucune question n'a été trouvée.\nAjoute tes fichiers Moodle et relance l'application !", "Dialog", JOptionPane.ERROR_MESSAGE);
                 System.exit(0);
 
             }
@@ -103,16 +103,16 @@ public class FileManager {
                 dIndex = 12, dFeedbackIndex = 13,
                 eIndex = 14, eFeedbackIndex = 15;
 
-        this.bar = new ProgressBar("Enregistrement des questions", 100);
-        this.bar.showProgressBar();
+        ProgressBar bar = new ProgressBar("Enregistrement des questions", 100);
+        bar.showProgressBar();
 
         for(Map.Entry<String, LinkedList<Path>> entries : this.questionsFiles.entrySet()) {
 
             final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             final Test test = Main.getInstance().getTests().get(TestType.getTypeByName(entries.getKey()));
 
-            this.bar.setTitle("Enregistrement : " + entries.getKey());
-            this.bar.setMaximum(entries.getValue().size());
+            bar.setTitle("Enregistrement : " + entries.getKey());
+            bar.setMaximum(entries.getValue().size());
 
             int index = 0;
 
@@ -122,36 +122,34 @@ public class FileManager {
 
                     final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                     final Document document = documentBuilder.parse(files.toFile());
-                    final Question question = new Question(readTextFromXML(questionTextIndex, document), readTextFromXML(generalFeedbackIndex, document)
+                    final Question question = new Question(readTextFromXML(files, questionTextIndex, document), readTextFromXML(files, generalFeedbackIndex, document)
                             , getImagesFromXML(document, Balise.QUESTION_TEXT), getImagesFromXML(document, Balise.GENERAL_FEEDBACK));
 
-                    question.registerProposition(readTextFromXML(aIndex, document), readTextFromXML(aFeedbackIndex, document),
+                    question.registerProposition(readTextFromXML(files, aIndex, document), readTextFromXML(files, aFeedbackIndex, document),
                             getImagesFromXML(document, Balise.ANSWER, 0), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 0), isPropositionCorrect(aIndex, document));
-                    question.registerProposition(readTextFromXML(bIndex, document), readTextFromXML(bFeedbackIndex, document),
+                    question.registerProposition(readTextFromXML(files, bIndex, document), readTextFromXML(files, bFeedbackIndex, document),
                             getImagesFromXML(document, Balise.ANSWER, 1), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 1), isPropositionCorrect(bIndex, document));
-                    question.registerProposition(readTextFromXML(cIndex, document), readTextFromXML(cFeedbackIndex, document),
+                    question.registerProposition(readTextFromXML(files, cIndex, document), readTextFromXML(files, cFeedbackIndex, document),
                             getImagesFromXML(document, Balise.ANSWER, 2), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 2), isPropositionCorrect(cIndex, document));
-                    question.registerProposition(readTextFromXML(dIndex, document), readTextFromXML(dFeedbackIndex, document),
+                    question.registerProposition(readTextFromXML(files, dIndex, document), readTextFromXML(files, dFeedbackIndex, document),
                             getImagesFromXML(document, Balise.ANSWER, 3), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 3), isPropositionCorrect(dIndex, document));
-                    question.registerProposition(readTextFromXML(eIndex, document), readTextFromXML(eFeedbackIndex, document),
+                    question.registerProposition(readTextFromXML(files, eIndex, document), readTextFromXML(files, eFeedbackIndex, document),
                             getImagesFromXML(document, Balise.ANSWER, 4), getImagesFromXML(document, Balise.ANSWER_FEEDBACK, 4), isPropositionCorrect(eIndex, document));
 
                     test.getQuestions().add(question);
 
                     Thread.sleep(10);
 
-                } catch (SAXException | IOException | ParserConfigurationException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                } catch (SAXException | IOException | ParserConfigurationException | InterruptedException e) { throw new RuntimeException(e); }
 
-                this.bar.updateBar(index);
+                bar.updateBar(index);
                 index++;
 
             }
 
         }
 
-        this.bar.getjDialog().dispose();
+        bar.getjDialog().dispose();
         JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), "Toutes Les questions ont été enregistrées !\nTu peux générer la colle !");
 
     }
@@ -195,7 +193,16 @@ public class FileManager {
 
     }
 
-    private String readTextFromXML(final int index, final Document document) {
+    private String readTextFromXML(final Path file, final int index, final Document document) {
+
+        if(document.getElementsByTagName("text").item(index) == null) {
+
+            JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), "Le fichier " + file.getFileName() + " n'a pas été reconnu." +
+                    "\nIl est peut-être dans un format non reconnu (QROC par exemple)." +
+                    "\nRetire-le pour continuer.");
+            System.exit(-1);
+
+        }
 
         String text = document.getElementsByTagName("text").item(index).getTextContent();
         text = text.replaceAll("<.*?>", "");
