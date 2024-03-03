@@ -1,6 +1,7 @@
 package fr.antoine.files;
 
 import fr.antoine.Main;
+import fr.antoine.gui.ProgressBar;
 import fr.antoine.questions.Question;
 import fr.antoine.questions.tests.Test;
 import fr.antoine.questions.tests.TestType;
@@ -9,9 +10,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +24,7 @@ import java.util.*;
 public class FileManager {
 
     private final Path folder;
+    private ProgressBar bar;
 
     private final LinkedHashMap<String, LinkedList<Path>> questionsFiles;
 
@@ -43,6 +47,9 @@ public class FileManager {
                 for(TestType types : TestType.values())
 
                     Files.createDirectory(Paths.get(this.folder + "/" + types.getFrenchName()));
+
+                JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), "Le dossier \"questions\" a été créé. \nTu peux ajouter les fichiers Moodle et relancer l'application !");
+                System.exit(0);
 
             }
 
@@ -68,6 +75,19 @@ public class FileManager {
 
             });
 
+            boolean areAllEmpty = true;
+
+            for(Map.Entry<String, LinkedList<Path>> entries : this.questionsFiles.entrySet())
+
+                if(!entries.getValue().isEmpty()) areAllEmpty = false;
+
+            if(areAllEmpty) {
+
+                JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), "Aucune question n'a été trouvée.\nAjoute tes fichiers Moodle et relance l'application !");
+                System.exit(0);
+
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -83,10 +103,18 @@ public class FileManager {
                 dIndex = 12, dFeedbackIndex = 13,
                 eIndex = 14, eFeedbackIndex = 15;
 
+        this.bar = new ProgressBar("Enregistrement des questions", 100);
+        this.bar.showProgressBar();
+
         for(Map.Entry<String, LinkedList<Path>> entries : this.questionsFiles.entrySet()) {
 
             final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             final Test test = Main.getInstance().getTests().get(TestType.getTypeByName(entries.getKey()));
+
+            this.bar.setTitle("Enregistrement : " + entries.getKey());
+            this.bar.setMaximum(entries.getValue().size());
+
+            int index = 0;
 
             for(Path files : entries.getValue()) {
 
@@ -110,13 +138,21 @@ public class FileManager {
 
                     test.getQuestions().add(question);
 
-                } catch (SAXException | IOException | ParserConfigurationException e) {
+                    Thread.sleep(10);
+
+                } catch (SAXException | IOException | ParserConfigurationException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+
+                this.bar.updateBar(index);
+                index++;
 
             }
 
         }
+
+        this.bar.getjDialog().dispose();
+        JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), "Toutes Les questions ont été enregistrées !\nTu peux générer la colle !");
 
     }
 

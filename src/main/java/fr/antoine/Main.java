@@ -14,6 +14,7 @@ public class Main {
     private static Main instance;
 
     private final FileManager fileManager;
+    private MainFrame mainFrame;
     private final LinkedHashMap<TestType, Test> tests;
 
     public static void main(String[] args) { new Main(); }
@@ -24,11 +25,11 @@ public class Main {
 
         this.tests = new LinkedHashMap<>();
 
+        this.mainFrame = new MainFrame(); //Start frame
+
         this.fileManager = new FileManager();
         this.fileManager.registerFiles();
         this.fileManager.readFiles();
-
-        new MainFrame(); //Start frame
 
     }
 
@@ -38,6 +39,10 @@ public class Main {
 
     public FileManager getFileManager() {
         return fileManager;
+    }
+
+    public MainFrame getMainFrame() {
+        return mainFrame;
     }
 
     public LinkedHashMap<TestType, Test> getTests() {
