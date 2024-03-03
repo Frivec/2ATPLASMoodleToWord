@@ -35,6 +35,7 @@ public class MainFrame extends JFrame {
     private JButton chooseDestinationButton;
     private JLabel folderDestinationLabel;
     private JLabel destinationConfirmationLabel;
+    private JLabel creditLabel;
 
     private JFileChooser chooser;
     private Path destination;
@@ -139,7 +140,7 @@ public class MainFrame extends JFrame {
      */
     private void $$$setupUI$$$() {
         startPanel = new JPanel();
-        startPanel.setLayout(new GridLayoutManager(3, 3, new Insets(0, 0, 0, 0), -1, -1));
+        startPanel.setLayout(new GridLayoutManager(4, 3, new Insets(0, 0, 0, 0), -1, -1));
         headerTitle = new JLabel();
         Font headerTitleFont = this.$$$getFont$$$("Arial Black", Font.BOLD, 16, headerTitle.getFont());
         if (headerTitleFont != null) headerTitle.setFont(headerTitleFont);
@@ -213,6 +214,13 @@ public class MainFrame extends JFrame {
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         startPanel.add(panel3, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(20, -1), null, 0, false));
+        creditLabel = new JLabel();
+        Font creditLabelFont = this.$$$getFont$$$(null, Font.ITALIC, 8, creditLabel.getFont());
+        if (creditLabelFont != null) creditLabel.setFont(creditLabelFont);
+        creditLabel.setForeground(new Color(-16777216));
+        creditLabel.setText("Programme créé par Antoine (VP LAS 23-24)");
+        creditLabel.setVerticalAlignment(0);
+        startPanel.add(creditLabel, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, new Dimension(-1, 20), 0, false));
     }
 
     /**
