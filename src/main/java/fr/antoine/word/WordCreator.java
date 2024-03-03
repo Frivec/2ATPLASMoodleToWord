@@ -185,16 +185,17 @@ public class WordCreator {
                         }
 
                         //Paragraph for images
-                        paragraph = document.createParagraph();
-                        paragraph.setStyle("Normal");
-                        paragraph.setAlignment(ParagraphAlignment.CENTER);
+                        for (String compressedImage : question.getGeneralFbImage()) {
 
-                        run = paragraph.createRun();
-                        run.setText(question.getGeneralFeedback());
+                            paragraph = document.createParagraph();
+                            paragraph.setStyle("Normal");
+                            paragraph.setAlignment(ParagraphAlignment.CENTER);
 
-                        for (String compressedImage : question.getGeneralFbImage())
+                            run = paragraph.createRun();
 
                             this.addImage(run, compressedImage);
+
+                        }
 
                     }
 
