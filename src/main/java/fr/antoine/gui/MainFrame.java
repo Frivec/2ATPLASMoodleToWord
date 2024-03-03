@@ -2,6 +2,7 @@ package fr.antoine.gui;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import fr.antoine.Main;
 import fr.antoine.word.WordCreator;
 
 import javax.swing.*;
@@ -90,6 +91,10 @@ public class MainFrame extends JFrame {
                 if (isCorrection.isSelected())
 
                     wordCreator.createWordFile(true);
+
+                JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), "Le" + ((isCorrection.isSelected() && isSubject.isSelected()) ? "s" : "")
+                        + " fichier" + ((isCorrection.isSelected() && isSubject.isSelected()) ? "s" : "") + ((isCorrection.isSelected() && isSubject.isSelected()) ? " ont" : " a")
+                        + " bien été créé" + ((isCorrection.isSelected() && isSubject.isSelected()) ? "s" : ""));
 
             }
         });

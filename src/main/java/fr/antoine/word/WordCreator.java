@@ -215,8 +215,6 @@ public class WordCreator {
             inputStream.close();
             wordModelStream.close();
 
-            System.out.println("Colle générée avec succès !");
-
         } catch (IOException | InvalidFormatException e) {
 
             JOptionPane.showMessageDialog(Main.getInstance().getMainFrame(), """
