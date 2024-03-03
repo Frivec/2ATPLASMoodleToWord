@@ -104,7 +104,7 @@ public class WordCreator {
                     run.setItalic(true);
                     run.setFontSize(18);
                     run.setFontFamily("RockWell");
-                    run.setText("moduleX@asso2atp.fr");
+                    run.setText(tests.getKey().getMail());
 
                 }
 
